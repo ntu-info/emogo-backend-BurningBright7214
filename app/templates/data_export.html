@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ project_name }} · Data Export</title>
+    <style>
+      :root {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #142748;
+        background-color: #f6f7fb;
+      }
+      body {
+        margin: 0;
+        padding: 2rem;
+      }
+      h1 {
+        margin-bottom: 0.25rem;
+      }
+      .subtitle {
+        color: #506283;
+        margin-bottom: 2rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(20, 39, 72, 0.08);
+      }
+      thead {
+        background: #f0f3ff;
+      }
+      th,
+      td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e4e8f3;
+      }
+      th {
+        font-size: 0.85rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6c7ca4;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .badge {
+        display: inline-flex;
+        padding: 0.15rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        background: #eef3ff;
+        color: #41509b;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .actions a {
+        display: inline-block;
+        margin-right: 0.5rem;
+        padding: 0.5rem 0.8rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s ease;
+      }
+      .actions a.json {
+        background: #ebf8ff;
+        color: #0a6fbf;
+      }
+      .actions a.csv {
+        background: #fff3e6;
+        color: #cc6a00;
+      }
+      .actions a:hover {
+        filter: brightness(0.95);
+      }
+      .token-info {
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.5rem;
+        background: #fff8d8;
+        border: 1px solid #f7e5a0;
+        border-radius: 10px;
+        color: #8a6d1e;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>{{ project_name }} Export Portal</h1>
+    <p class="subtitle">下載 EmoGo 前端蒐集的所有資料類型。</p>
+
+    {% if token_enabled %}
+    <div class="token-info">
+      目前已啟用下載 Token 驗證。若看到「Unauthorized」請於網址列加上
+      <code>?token=YOUR_TOKEN</code>，或在下方按鈕後自行補上 <code>&token=YOUR_TOKEN</code>。
+    </div>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>Dataset</th>
+          <th>Total Records</th>
+          <th>Last Entry</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dataset in dataset_stats %}
+        <tr>
+          <td>
+            <span class="badge">{{ dataset.name }}</span>
+          </td>
+          <td>{{ dataset.total }}</td>
+          <td>{{ dataset.last_timestamp }}</td>
+          <td class="actions">
+            <a class="json" href="{{ dataset.json_url }}" target="_blank">JSON</a>
+            <a class="csv" href="{{ dataset.csv_url }}">CSV</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if recent_vlogs %}
+    <h2 style="margin-top: 2.5rem">最新影片資料</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Mood</th>
+          <th>Label</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vlog in recent_vlogs %}
+        <tr>
+          <td>{{ vlog.timestamp }}</td>
+          <td>{{ vlog.moodScore }}</td>
+          <td>{{ vlog.moodLabel }}</td>
+          <td class="actions">
+            <a class="csv" href="{{ vlog.download_url }}" download>下載 {{ vlog.filename }}</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </body>
+</html>
+
