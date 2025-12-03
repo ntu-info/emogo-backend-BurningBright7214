@@ -51,17 +51,21 @@ setx MONGODB_URI "<your-connection-uri>"    # 或使用 .env
 uvicorn main:app --reload
 ```
 
-啟動後即可：
-- `http://127.0.0.1:8000/docs`：互動式 API 說明
-- `http://127.0.0.1:8000/data-export?token=emogo-test-token`：資料下載頁面（若更換 token 記得更新 query）
+啟動後即可（依使用情境選擇 Base URL）：
+- **Local**：`http://127.0.0.1:8000/docs`、`http://127.0.0.1:8000/data-export?token=emogo-test-token`
+- **Render**：`https://emogo-backend-burningbright7214.onrender.com/docs`、`https://emogo-backend-burningbright7214.onrender.com/data-export?token=emogo-test-token`
 
 ## 影片上傳 / 匯出 / 測試流程
 
 1. 依白板教學建立 MongoDB Atlas，使用 `MongoDB Compass` 建立 `vlogs`、`sentiments`、`gps` 集合並插入測試資料（可造假）。
-2. 測試影片上傳（儲存於 Mongo GridFS，下載 URI 為 `/media/{file_id}`）：
+2. 測試影片上傳（儲存於 Mongo GridFS，下載 URI 為 `/media/{file_id}`）。以下範例以 PowerShell 為例，可自行切換 Base URL：
 
 ```bash
-curl -X POST http://127.0.0.1:8000/api/v1/vlogs \
+set BASE_URL=http://127.0.0.1:8000
+:: 若要直接 hitting Render，改成：
+:: set BASE_URL=https://emogo-backend-burningbright7214.onrender.com
+
+curl -X POST %BASE_URL%/api/v1/vlogs \
   -F "file=@sample.mp4" \
   -F "timestamp=2025-12-03T10:00:00" \
   -F "moodScore=7" \
@@ -73,7 +77,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/vlogs \
 
 呼叫成功後會回傳 `videoStorageId` 與 `videoUri=/media/{id}`，所有下載都透過 FastAPI 端點處理，不需知道前端 URI。
 
-3. 確認後端啟動，造訪 `/data-export` 頁面。此頁面：
+3. 確認後端啟動，造訪 `BASE_URL/data-export?token=...` 頁面。此頁面：
    - 顯示三種資料的筆數與最後一筆時間，並提供 JSON/CSV 匯出按鈕（`/export/{dataset}?format=json|csv`）。
    - 額外列出最新 10 筆 vlog，提供直接的影片下載按鈕（指向 `/media/{file_id}`）。
 4. 點選 JSON/CSV 下載或影片下載按鈕即可驗證整體流程；若有設定 token，請在所有匯出/下載網址後加上 `?token=YOUR_TOKEN`（`/media/{file_id}` 也支援）。
