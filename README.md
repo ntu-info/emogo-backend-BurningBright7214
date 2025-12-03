@@ -4,15 +4,13 @@
 
 ## 立即重點
 
-- **資料匯出頁面 URI（請在部署後更新成實際網址）**
-  - 本地開發：`http://127.0.0.1:8000/data-export`
-  - Render 正式站：`https://<your-render-app>.onrender.com/data-export`
-  - 若設定 `EXPORT_TOKEN`，請在網址後加上 `?token=YOUR_TOKEN`
-- **三種資料型別**：`/api/v1/datasets/vlogs`、`/sentiments`、`/gps`
+- **資料匯出頁面 URI**
+  - 本地開發：`http://127.0.0.1:8000/data-export?token=emogo-test-token`
+  - Render 正式站：[`https://emogo-backend-burningbright7214.onrender.com/data-export?token=emogo-test-token`](https://emogo-backend-burningbright7214.onrender.com/data-export?token=emogo-test-token)
+- **三種資料匯出 API**：`/export/vlogs`、`/export/sentiments`、`/export/gps`（支援 `?format=json|csv`）
 - **影片上傳/下載**：`POST /api/v1/vlogs`（multipart 上傳影片 + metadata），`GET /media/{file_id}` 下載 GridFS 檔案
 - **健康檢查**：`/api/v1/health`
-
-> ✅ 請務必在部署完成後，把正式站的 `https://.../data-export` URI 更新回本段，並於 NTU COOL 提交 GitHub 連結與此 URI。
+- **公共首頁**：[`https://emogo-backend-burningbright7214.onrender.com`](https://emogo-backend-burningbright7214.onrender.com) 會回傳 `{ "service": "EmoGo Backend", ... }`
 
 ## 專案結構
 
@@ -55,7 +53,7 @@ uvicorn main:app --reload
 
 啟動後即可：
 - `http://127.0.0.1:8000/docs`：互動式 API 說明
-- `http://127.0.0.1:8000/data-export`：資料下載頁面（有 token 就加上 query）
+- `http://127.0.0.1:8000/data-export?token=emogo-test-token`：資料下載頁面（若更換 token 記得更新 query）
 
 ## 影片上傳 / 匯出 / 測試流程
 
@@ -90,7 +88,19 @@ curl -X POST http://127.0.0.1:8000/api/v1/vlogs \
    - `MONGODB_URI`（請勿直接硬編碼到 repo）
    - `DATABASE_NAME=emogo`
    - `EXPORT_TOKEN=<自訂安全 token>`
-4. 部署完成後，瀏覽 `https://<render-app>.onrender.com/data-export`，確認可以下載三大資料集。
+4. 部署完成後，瀏覽 `https://emogo-backend-burningbright7214.onrender.com/data-export?token=emogo-test-token`，確認可以下載三大資料集與影片。
+
+## 線上驗證 (Render)
+
+1. **根路由/健檢**
+   - `https://emogo-backend-burningbright7214.onrender.com/`：應回傳服務資訊與文件入口。
+   - `https://emogo-backend-burningbright7214.onrender.com/api/v1/health`：應顯示 `status: ok`、`database: reachable`。
+2. **下載測試**
+   - `https://emogo-backend-burningbright7214.onrender.com/data-export?token=emogo-test-token`：檢視三類資料筆數、最新 vlog，以及 JSON/CSV 下載按鈕。
+   - `https://emogo-backend-burningbright7214.onrender.com/export/vlogs?format=json&token=emogo-test-token`（或 `sentiments` / `gps`）應直接回傳 JSON。
+   - `https://emogo-backend-burningbright7214.onrender.com/media/<videoStorageId>?token=emogo-test-token`：應下載 MP4 檔案（可從資料匯出頁的「最新影片」表格取得 `videoStorageId`）。
+3. **Swagger 文件**
+   - `https://emogo-backend-burningbright7214.onrender.com/docs`：可在瀏覽器內直接呼叫 API 測試。
 
 ## 前端整合（可選）
 
